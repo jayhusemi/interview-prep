@@ -2,7 +2,265 @@
 2. Write a function for zigzag traversal in a binary tree
 Input: 
 Output: [1, 3, 2, 4, 5, 6, 8, 7]
-Explanation: Zigzag Traversal first iterates the given level of the tree from left to right and then the next level as the right to the level.
+Explanation: Zigzag Traversal first iterates the given level of the tree from left to right and then the next level as the right to the left.
 
 */
+
+// Tree Node
+struct Node {
+    int data;
+    Node* left;
+    Node* right;
+};
+
+//Function to store the zigzag order traversal of a tree in a list.
+    vector <int> zigZagTraversal(Node* root)
+    {
+     //creating two stacks for level traversals in both order
+    	stack<Node*> st1;
+    	stack<Node*> st2;
+     //vector to store the zigzag traversal
+    	vector<int> result;
+    	
+     //Initialize the first stack with the root element
+    	st1.push(root);
+    	
+     //Iterate until either of the stack is not empty
+    	while(!st1.empty() || !st2.empty()){
+        //iterate until the first stack is not empty
+    	    while(!st1.empty()){
+    	        Node* temp=st1.top();
+    	        st1.pop();
+    	        result.push_back(temp->data);
+    	        
+    	        if(temp->left)
+    	            st2.push(temp->left);
+    	        if(temp->right)
+    	            st2.push(temp->right);
+    	    }
+         //Iterate until the second stack is not empty
+    	    while(!st2.empty()){
+    	        Node* temp=st2.top();
+    	        st2.pop();
+    	        result.push_back(temp->data);
+    	        
+    	        if(temp->right)
+    	            st1.push(temp->right);
+    	        if(temp->left)
+    	            st1.push(temp->left);
+    	        
+    	    }
+    	}
+    	return result;
+    }
+
+
+
+
+/*my solution*/
+
+/*
+2. Write a function for zigzag traversal in a binary tree
+Input: 
+Output: [1, 3, 2, 4, 5, 6, 8, 7]
+Explanation: Zigzag Traversal first iterates the given level of the tree from left to right and then the next level as the right to the left.
+
+*/
+#include <bits/stdc++.h>
+using namespace std;
+
+
+
+
+struct binTreeNode{
+     
+       binTreeNode * lChild;
+       binTreeNode  * rChild;
+       int   element;
+
+       binTreeNode(int data): element(data), lChild(nullptr), rChild(nullptr){};
+};
+
+
+class binTree {
+ private:
+   binTreeNode  *root;
+ public:
+  binTree(){
+  root= nullptr;//new binTreeNode(100);
+ };
+
+  binTreeNode * getroot(){
+   return root;
+  }
+
+  int insert( binTreeNode* root, binTreeNode * new_node){
+        
+       queue<binTreeNode *> q;
+       if(root==nullptr) {this->root = new_node;}
+       else q.push(root);
+       
+       for (;!q.empty();){
+            binTreeNode * x = q.front(); q.pop();
+            if(x->lChild==nullptr) {x->lChild= new_node;break;}
+            else if(x->rChild==nullptr){ x->rChild = new_node;break;}
+            else {q.push(x->lChild);q.push(x->rChild);}
+            }
+    return 0;
+ }
+
+ int zigzag (binTreeNode * root ){
+    queue <binTreeNode*> q;
+    queue <bool> q_l2r;
+    stack <binTreeNode *> s0,s1;
+    stack <bool> s0_l2r,s1_l2r;
+
+    bool l2r=false;
+    if(root==nullptr) return -1;
+    else 
+    {
+        s0.push(root);
+        s0_l2r.push(l2r);
+    }
+    
+
+  for(;!s0.empty() || !s1.empty(); ) {
+    for(;!s0.empty();){
+        binTreeNode * x = s0.top(); 
+        bool l2r_0 = s0_l2r.top();
+        s0.pop();
+        s0_l2r.pop();
+              
+        if(x->lChild!=nullptr) {
+             s1.push(x->lChild);
+             s1_l2r.push(!l2r_0);
+        }
+        if(x->rChild!=nullptr) {
+                s1.push(x->rChild);
+                s1_l2r.push(!l2r_0);
+        }
+        
+       cout <<x->element<<" ";
+    }
+    cout <<endl;
+    for(;!s1.empty();){
+        binTreeNode * x = s1.top(); 
+        bool l2r_1 = s1_l2r.top();
+        s1.pop();
+        s1_l2r.pop();
+
+        if(x->rChild!=nullptr) {
+            s0.push(x->rChild);
+            s0_l2r.push(!l2r_1);}
+        if(x->lChild!=nullptr) {
+             s0.push(x->lChild);
+             s0_l2r.push(!l2r_1);
+        }
+       
+    
+        
+       cout <<x->element<<" ";
+    }
+    cout <<endl;
+  }
+
+    return 0;
+}
+
+//int build(binTreeNode* root ){
+    int build(){
+    int nodeCnt=16;
+    //cin >> nodeCnt;
+    int element;
+    binTreeNode * node ;//= new binTreeNode(1);
+    for(int i=0;i<nodeCnt;i++){
+        //cin >> element;
+        element =i;
+        node = new binTreeNode(element);
+       
+        insert(this->root,node);
+    }
+
+   
+
+    return 0;
+       
+}
+
+};
+
+int main(){
+    binTree *bt= new binTree;
+  
+    binTreeNode * xt = nullptr;// new binTreeNode(9999);// bt->getroot();
+    bt->build( );
+    
+    xt = bt->getroot();
+    bt->zigzag(xt);
+  return 0;
+}
+
+
+
+////////////////////chatgpt version: double queue///////////////////
+void zigzag(binTreeNode* root) {
+    if (!root) return;
+
+    queue<binTreeNode*> q;
+    q.push(root);
+    bool leftToRight = true;
+
+    while (!q.empty()) {
+        int size = q.size();
+        deque<int> level;
+
+        for (int i = 0; i < size; ++i) {
+            binTreeNode* x = q.front(); q.pop();
+            if (!x) continue;
+
+            if (leftToRight) level.push_back(x->element);
+            else level.push_front(x->element);
+
+            if (x->lChild) q.push(x->lChild);
+            if (x->rChild) q.push(x->rChild);
+        }
+
+        // Output the current level
+        for (int val : level) cout << val << " ";
+        leftToRight = !leftToRight;
+    }
+
+    cout << endl;
+}
+
+
+////////////////////chatgpt version: array level and re-index///////////////////
+void zigzag(binTreeNode* root) {
+    if (!root) return;
+
+    queue<binTreeNode*> q;
+    q.push(root);
+    bool leftToRight = true;
+
+    while (!q.empty()) {
+        int size = q.size();
+        vector<int> level(size);
+
+        for (int i = 0; i < size; ++i) {
+            binTreeNode* x = q.front(); q.pop();
+            if (!x) continue; // safety check
+
+            int idx = leftToRight ? i : size - 1 - i;
+            level[idx] = x->element;
+
+            if (x->lChild) q.push(x->lChild);
+            if (x->rChild) q.push(x->rChild);
+        }
+
+        for (int val : level) cout << val << " ";
+        leftToRight = !leftToRight;
+    }
+
+    cout << endl;
+}
 
