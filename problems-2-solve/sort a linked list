@@ -1,0 +1,296 @@
+3. Write a function to sort a linked list of 0s, 1s and 2s
+Input: 0->1->0->2->1->0->2->1
+Output: 0->0->0->1->1->1->2->2
+Explanation: All 0’s will come first then 1s and then 2s. This can be done in O(n) time by counting the occurrences of all three and rearranging them in the linked list.
+
+/*3. Write a function to sort a linked list of 0s, 1s and 2s
+Input: 0->1->0->2->1->0->2->1
+Output: 0->0->0->1->1->1->2->2
+Explanation: All 0’s will come first then 1s and then 2s. This can be done in O(n) time by counting the occurrences of all three and rearranging them in the linked list.
+*/
+
+
+
+///////////////////general sorting of link list//////////////////////
+#include <bits/stdc++.h>
+using namespace std;
+
+struct node{
+    int element;
+    node *next;
+    node(int i=0):element (i), next(nullptr){};
+};
+class ll{
+    private:
+        node * head;
+        node * tail;
+
+    public:
+        ll(){
+            head = new node;
+            tail = head;
+        }
+        ll(node * & new_head){
+            head =  new_head;
+            tail = head;
+        }
+        void setHead(node *node){
+            this->head = node;
+        }
+        void getTail(){
+            node *cur=this->head;
+            for(;cur->next!=nullptr;){
+                cur = cur->next;
+            }
+            this->tail = cur;
+        }
+        void append(node* new_node){
+            node *cur;
+            
+            tail->next = new_node;
+            tail = tail->next;
+        }
+        bool operator()(const node* x, const node* y) const {
+                return (x->element < y->element);
+        }
+        bool islessthan(node *x, node*y){
+            return (x->element < y->element)?true:false;
+        }
+        void swapNode(node * &preX, node* &x, node * &preY, node* &y){
+            node *preTmp = preY;
+            node *tmp = y;
+
+            preY = preX;
+            y = x;
+
+            preX = preTmp;
+            x = tmp;
+            
+        }
+        void removeNode (node*x, node*preX){
+            preX->next = x->next;
+        }
+        void insert(node*x, node*position , node *prePosition){
+            if (position == this->head) {
+                this->head = x;
+            }
+            prePosition->next = x;
+            x->next = position;
+        }
+
+        int sort(){
+            node dummy;
+            dummy.next=this->head;
+            
+            node *preCur = this->head;
+            node * cur =  this->head->next; //node after head
+            
+            if(cur==nullptr){return 0;}
+
+            for(;cur != nullptr;){
+                node * prePosition = &dummy;
+                node * position = head; 
+
+                node * curNext =cur->next; //move to next by defaut;
+                node * preCurNext = cur;    //move to next
+
+                
+               for(;cur != position;){ //cmp cur to the list : head...(cur-1)...
+                    if(islessthan(cur, position)) {
+                        removeNode(cur, preCur);
+                        curNext= cur->next; //move to next
+                        preCurNext = preCur; //keep, after rm node
+                        insert(cur, position, prePosition);
+                        break;
+                    }
+                    
+                    prePosition = position;
+                    position = position->next;
+                }
+                cur = curNext;
+                preCur= preCurNext;
+                
+            
+            }
+            return 0;
+        }
+
+        void print(){
+            node *cur = this->head;
+
+            for(;cur!= nullptr;){
+                cout << cur->element << " ";
+                cur = cur->next;
+            }
+            cout <<endl;
+        }
+        void clean(){
+            node *cur  = this->head;
+            node *nextNode=nullptr ;//= cur->next;
+            for(;cur != nullptr;){
+                nextNode = cur->next;
+                delete cur;
+                cur = nextNode; 
+                 
+            }
+        }
+    
+};
+
+int main(){
+    
+  node *new_node;
+  node * head_node = new node(100);
+
+  srand(static_cast<unsigned>(time(0))); // Seed for randomness
+
+  ll x (head_node);
+  for(int i=0;i<6;i++){
+    new_node = new node(rand() % 100);
+    x.append(new_node);
+    
+  }
+  x.print();
+  x.sort();
+  x.print();
+  x.clean();
+ 
+ return 0;
+}
+
+
+///////////////////0-1-2 sorting of link list of 0-1-2//////////////////////
+
+/*3. Write a function to sort a linked list of 0s, 1s and 2s
+Input: 0->1->0->2->1->0->2->1
+Output: 0->0->0->1->1->1->2->2
+Explanation: All 0’s will come first then 1s and then 2s. This can be done in O(n) time by counting the occurrences of all three and rearranging them in the linked list.
+*/
+#include <bits/stdc++.h>
+using namespace std;
+
+struct node{
+    int element;
+    node *next;
+    node(int i=0):element (i), next(nullptr){};
+};
+class ll{
+    private:
+        node * head;
+        node * tail;
+
+    public:
+        ll(){
+            head = new node;
+            tail = head;
+        }
+        ll(node * new_head){
+            head =  new_head;
+            tail = head;
+            getTail();
+        }
+        void setHead(node *node){
+            this->head = node;
+        }
+        void getTail(){
+            node *cur=this->head;
+            if(cur == nullptr) {
+                tail = nullptr;
+                return;
+            }
+            for(;cur->next!=nullptr;){
+                cur = cur->next;
+            }
+            this->tail = cur;
+        }
+        void append(node* new_node){
+            if (head == nullptr) {
+                head = new_node;
+                tail = new_node;
+                return;
+            }
+            tail->next = new_node;
+            tail = tail->next;
+        }
+
+        void sort012(){
+            if (head == nullptr || head->next == nullptr) {
+                return;
+            }
+
+            int count0 = 0;
+            int count1 = 0;
+            int count2 = 0;
+
+            node* current = head;
+            while (current != nullptr) {
+                if (current->element == 0) {
+                    count0++;
+                } else if (current->element == 1) {
+                    count1++;
+                } else {
+                    count2++;
+                }
+                current = current->next;
+            }
+
+            current = head;
+            for (int i = 0; i < count0; ++i) {
+                current->element = 0;
+                current = current->next;
+            }
+            for (int i = 0; i < count1; ++i) {
+                current->element = 1;
+                current = current->next;
+            }
+            for (int i = 0; i < count2; ++i) {
+                current->element = 2;
+                current = current->next;
+            }
+        }
+
+        void print(){
+            node *cur = this->head;
+            if (cur == nullptr) {
+                cout << "List is empty" << endl;
+                return;
+            }
+            for(;cur!= nullptr;){
+                cout << cur->element << " ";
+                cur = cur->next;
+            }
+            cout <<endl;
+        }
+        void clean(){
+            node *cur  = this->head;
+            node *nextNode=nullptr ;//= cur->next;
+            while(cur != nullptr){
+                nextNode = cur->next;
+                delete cur;
+                cur = nextNode;
+            }
+            head = nullptr;
+            tail = nullptr;
+        }
+
+};
+
+int main(){
+
+  node *new_node;
+  node * head_node = new node(1);
+
+  ll x (head_node);
+  x.append(new node(0));
+  x.append(new node(2));
+  x.append(new node(1));
+  x.append(new node(0));
+  x.append(new node(2));
+  x.append(new node(1));
+  x.print();
+  x.sort012();
+  x.print();
+  x.clean();
+
+ return 0;
+}
